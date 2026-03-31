@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chancenkarte">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a3d2b">
+<meta name="description" content="قائمة مستندات Chancenkarte الألمانية">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- iOS home screen icons (replace icon-*.png with your actual icon files) -->
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+
+<title>Chancenkarte — Michael Kamal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-dark:  #1a3d2b;
+    --green-mid:   #2d6a4f;
+    --green-light: #52b788;
+    --green-pale:  #e8f5ec;
+    --green-bg:    #f0f4f0;
+    --text-dark:   #0f1f0f;
+    --text-mid:    #3a5a3a;
+    --text-muted:  #7a9a7a;
+    --border:      #cfe0cf;
+    --white:       #ffffff;
+    --red-pale:    #fff0f0;
+    --red-border:  #f5c6c6;
+    --red-text:    #b83030;
+    --safe-bottom: env(safe-area-inset-bottom, 16px);
+
+    /* Header heights */
+    --header-full:     190px;
+    --header-mini:      58px;
+    --tabbar-h:         44px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html { height: 100%; }
+  body {
+    height: 100%;
+    font-family: 'Cairo', sans-serif;
+    background: var(--green-bg);
+    color: var(--text-dark);
+    direction: rtl;
+    font-size: 16px;
+    max-width: 480px;
+    margin: 0 auto;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sticky-top {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+  }
+
+  .header-full {
+    background: var(--green-dark);
+    padding: 44px 18px 16px;
+    overflow: hidden;
+    position: relative;
+    transition: height 0.32s ease, padding 0.32s ease, opacity 0.25s ease;
+    height: var(--header-full);
+  }
+  .header-full.collapsed {
+    height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .header-forest {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 64px;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+
+  .header-row1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    position: relative; z-index: 1;
+  }
+  .header-flag  { font-size: 26px; }
+  .header-badge {
+    background: rgba(255,255,255,0.13);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #c8e6d0;
+  }
+
+  .header-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: #7ab898;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+    position: relative; z-index: 1;
+  }
+  .header-quote {
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.35;
+    margin-bottom: 3px;
+    position: relative; z-index: 1;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: #7ab898;
+    margin-bottom: 12px;
+    position: relative; z-index: 1;
+  }
+
+  .header-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 10px 14px;
+    position: relative; z-index: 1;
+  }
+  .ring-wrap { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-bg   { fill: none; stroke: rgba(255,255,255,0.15); stroke-width: 5; }
+  .ring-fill {
+    fill: none; stroke: var(--green-light);
+    stroke-width: 5; stroke-linecap: round;
+    stroke-dasharray: 113.1;
+    stroke-dashoffset: 113.1;
+    transition: stroke-dashoffset 0.5s ease;
+  }
+  .ring-pct {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; color: #fff;
+  }
+  .prog-info-label { font-size: 11px; color: #86b89a; }
+  .prog-info-count { font-size: 20px; font-weight: 800; color: #fff; line-height: 1.1; }
+  .prog-info-total { font-size: 12px; color: #86b89a; }
+
+  .header-mini {
+    background: var(--green-dark);
+    height: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    transition: height 0.32s ease;
+    position: relative; z-index: 1;
+  }
+  .header-mini.visible { height: var(--header-mini); }
+
+  .mini-left {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .mini-flag { font-size: 20px; }
+  .mini-title { font-size: 15px; font-weight: 800; color: #fff; }
+  .mini-sub   { font-size: 11px; color: #7ab898; }
+
+  .mini-ring-wrap { position: relative; width: 36px; height: 36px; flex-shrink: 0; }
+  .mini-ring-wrap svg { transform: rotate(-90deg); }
+  .mini-ring-bg   { fill: none; stroke: rgba(255,255,255,0.15); stroke-width: 4; }
+  .mini-ring-fill {
+    fill: none; stroke: var(--green-light);
+    stroke-width: 4; stroke-linecap: round;
+    stroke-dasharray: 94.2;
+    stroke-dashoffset: 94.2;
+    transition: stroke-dashoffset 0.5s ease;
+  }
+  .mini-ring-pct {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 800; color: #fff;
+  }
+
+  .tab-bar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex-shrink: 0;
+    padding: 0 18px;
+    height: var(--tabbar-h);
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: none; border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex; align-items: center; gap: 7px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .tab-btn.active { color: var(--green-dark); border-bottom-color: var(--green-mid); }
+  .tab-count {
+    background: var(--green-pale);
+    color: var(--green-mid);
+    font-size: 11px; font-weight: 800;
+    border-radius: 10px; padding: 1px 7px;
+    min-width: 20px; text-align: center;
+  }
+  .tab-btn.active .tab-count { background: var(--green-mid); color: #fff; }
+
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 12px calc(var(--safe-bottom) + 76px);
+  }
+
+  .item-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 9px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .item-card.highlight {
+    border-color: var(--red-border);
+    background: var(--red-pale);
+  }
+  .item-card.done { opacity: 0.6; }
+
+  .item-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .item-check {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    border: 2px solid #b8d4b8;
+    background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+  .item-card.done .item-check { background: var(--green-mid); border-color: var(--green-mid); }
+  .item-check svg { opacity: 0; transition: opacity 0.15s; }
+  .item-card.done .item-check svg { opacity: 1; }
+
+  .item-body { flex: 1; min-width: 0; }
+  .item-num {
+    font-size: 11px; font-weight: 700;
+    color: var(--text-muted); margin-bottom: 2px;
+  }
+  .item-card.highlight .item-num { color: var(--red-text); }
+  .item-text {
+    font-size: 15px; font-weight: 700;
+    color: var(--text-dark); line-height: 1.5;
+  }
+  .item-card.done .item-text { text-decoration: line-through; color: var(--text-muted); }
+
+  .item-tag {
+    font-size: 11px; font-weight: 800;
+    padding: 3px 9px; border-radius: 6px;
+    flex-shrink: 0; align-self: flex-start; margin-top: 2px;
+    text-transform: uppercase; letter-spacing: 0.02em;
+  }
+  .tag-r { background: #fff0f0; color: var(--red-text); border: 1px solid var(--red-border); }
+  .tag-o { background: #fffbea; color: #9a6200; border: 1px solid #f0d880; }
+  .tag-p { background: #eaf4ff; color: #1a5a99; border: 1px solid #a8ccee; }
+
+  .item-notes {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.3s ease;
+    border-top: 0px solid var(--border);
+  }
+  .item-notes.open { max-height: 200px; border-top-width: 1px; }
+  .notes-inner { padding: 10px 14px 14px; }
+  .notes-label { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; }
+  .notes-inner textarea {
+    width: 100%; min-height: 62px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px; color: var(--text-dark);
+    background: var(--green-bg);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 12px; resize: none;
+    direction: rtl; outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+  }
+  .notes-inner textarea:focus { border-color: var(--green-mid); background: #fff; }
+  .notes-inner textarea::placeholder { color: #b0c8b0; }
+
+  .item-expand {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 14px 10px;
+    font-size: 12px; color: var(--text-muted);
+    cursor: pointer; font-weight: 600;
+  }
+  .expand-icon { transition: transform 0.25s ease; }
+  .item-card.expanded .expand-icon { transform: rotate(180deg); }
+
+  .complete-banner {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    border: 1px solid #6ee7b7;
+    border-radius: 14px;
+    padding: 18px; margin-bottom: 10px;
+    text-align: center; display: none;
+  }
+  .complete-banner.show { display: block; }
+  .complete-emoji { font-size: 32px; margin-bottom: 6px; }
+  .complete-title { font-size: 17px; font-weight: 800; color: #065f46; margin-bottom: 4px; }
+  .complete-text  { font-size: 14px; color: #047857; }
+
+  .bottom-bar {
+    position: fixed;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 10px 14px calc(var(--safe-bottom) + 6px);
+    display: flex; gap: 10px;
+    z-index: 50;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.07);
+  }
+  .btn-save {
+    flex: 1;
+    background: var(--green-dark); color: #fff;
+    border: none; border-radius: 12px;
+    padding: 13px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px; font-weight: 800;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    transition: background 0.2s;
+  }
+  .btn-save:active { background: #245235; transform: scale(0.98); }
+
+  .btn-reset {
+    background: #fff5f5; color: var(--red-text);
+    border: 1px solid var(--red-border);
+    border-radius: 12px; padding: 13px 16px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px; font-weight: 800;
+    cursor: pointer; white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .btn-reset:active { background: #fde8e8; transform: scale(0.98); }
+
+  .toast {
+    position: fixed;
+    bottom: calc(var(--safe-bottom) + 85px);
+    left: 50%; transform: translateX(-50%) translateY(30px);
+    background: var(--green-dark); color: #d0f0d8;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px; font-weight: 700;
+    padding: 10px 24px; border-radius: 50px;
+    z-index: 999; white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="sticky-top">
+  <div class="header-full" id="headerFull">
+    <svg class="header-forest" viewBox="0 0 480 64" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="0,64 22,18 44,64"   fill="#52b788"/>
+      <polygon points="32,64 56,8 80,64"   fill="#40916c"/>
+      <polygon points="64,64 90,20 116,64" fill="#52b788"/>
+      <polygon points="100,64 126,10 152,64" fill="#40916c"/>
+      <polygon points="136,64 164,4 192,64"  fill="#52b788"/>
+      <polygon points="174,64 200,16 226,64" fill="#40916c"/>
+      <polygon points="212,64 240,6 268,64"  fill="#52b788"/>
+      <polygon points="252,64 278,18 304,64" fill="#40916c"/>
+      <polygon points="292,64 318,10 344,64" fill="#52b788"/>
+      <polygon points="332,64 358,20 384,64" fill="#40916c"/>
+      <polygon points="372,64 400,6 428,64"  fill="#52b788"/>
+      <polygon points="414,64 442,16 470,64" fill="#40916c"/>
+      <rect x="0" y="56" width="480" height="8" fill="#2d6a4f"/>
+    </svg>
+
+    <div class="header-row1">
+      <div class="header-flag">🇩🇪</div>
+      <div class="header-badge">Chancenkarte</div>
+    </div>
+    <div class="header-name">Michael Kamal · Electrical Engineer</div>
+    <div class="header-quote">"Erfolg ist kein Zufall,sondern Vorbereitung."</div>
+    <div class="header-sub">النجاح ليس صدفة، بل هو التحضير الجيد </div>
+
+    <div class="header-progress">
+      <div class="ring-wrap">
+        <svg width="44" height="44" viewBox="0 0 44 44">
+          <circle class="ring-bg"   cx="22" cy="22" r="18"/>
+          <circle class="ring-fill" id="ringFill" cx="22" cy="22" r="18"/>
+        </svg>
+        <div class="ring-pct" id="ringPct">0%</div>
+      </div>
+      <div>
+        <div class="prog-info-label">المستندات المكتملة</div>
+        <div class="prog-info-count">
+          <span id="checkedCount">0</span><span class="prog-info-total"> / 17</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-mini" id="headerMini">
+    <div class="mini-left">
+      <div class="mini-flag">🇩🇪</div>
+      <div>
+        <div class="mini-title">Michael Kamal</div>
+        <div class="mini-sub">Chancenkarte</div>
+      </div>
+    </div>
+    <div class="mini-ring-wrap">
+      <svg width="36" height="36" viewBox="0 0 36 36">
+        <circle class="mini-ring-bg"   cx="18" cy="18" r="15"/>
+        <circle class="mini-ring-fill" id="miniRingFill" cx="18" cy="18" r="15"/>
+      </svg>
+      <div class="mini-ring-pct" id="miniRingPct">0%</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('all',this)">
+      الكل <span class="tab-count" id="cnt-all">17</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('pending',this)">
+      معلق <span class="tab-count" id="cnt-pending">17</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('done',this)">
+      مكتمل ✓ <span class="tab-count" id="cnt-done">0</span>
+    </button>
+  </div>
+</div>
+
+<div class="scroll-area" id="scrollArea">
+  <div class="complete-banner" id="completeBanner">
+    <div class="complete-emoji">🎉</div>
+    <div class="complete-title">كل المستندات جاهزة!</div>
+    <div class="complete-text"> عاش يابن اللعيبة يا وحش🚀</div>
+  </div>
+  <div id="listContainer"></div>
+</div>
+
+<div class="bottom-bar">
+  <button class="btn-save" onclick="saveAll()">
+    <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+    </svg>
+    حفظ التقدم
+  </button>
+  <button class="btn-reset" onclick="confirmReset()">إعادة ضبط</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ITEMS = [
+  { id:1,  text:'جواز السفر.',                                                                                                                   tag:'r' },
+  { id:2,  text:'صورة من جواز السفر.',                                                                                                            tag:'r' },
+  { id:3,  text:'صورة من صفحة التوقيع على جواز السفر.',                                                                                          tag:'r' },
+  { id:4,  text:'استمارة طلب VIDEX مملوءة بالكامل وموقعة.',                                                                                      tag:'r' },
+  { id:5,  text:'صور شخصية حديثة (لم يمر عليها أكثر من 6 أشهر، وبخلفية بيضاء، وبدون أي تعديل فوتوشوب).',                                      tag:'r' },
+  { id:6,  text:'التأمين الصحي: التأمين الوارد (Incoming Insurance) صالح طوال فترة الإقامة، ويغطي 30 ألف يورو.',                               tag:'r' },
+  { id:7,  text:'السيرة الذاتية.',                                                                                                                tag:'r' },
+  { id:8,  text:'الخطاب التحفيزي: يحتوي على تخطيط وقت ومحتوى الإقامة، مجال العمل أو المهنة التي تهمك، والشركات التي تريد التقديم إليها.',    tag:'r' },
+  { id:9,  text:'الضمان المالي أو الحساب المغلق بـ 13,092 يورو.',                                                                               tag:'r', highlight:true },
+  { id:10, text:'خطة الإقامة، أو دعوة خاصة مع صورة من جواز سفر الداعي.',                                                                        tag:'o' },
+  { id:11, text:'إثبات محاولة البحث عن عمل (إن وُجد).',                                                                                         tag:'o' },
+  { id:12, text:'إثبات العمل من جهة العمل الحالية بنسخة رسمية أصلية.',                                                                          tag:'r' },
+  { id:13, text:'خطاب توصية من جهة العمل الحالية.',                                                                                              tag:'r' },
+  { id:14, text:'أوراق اعتماد الشهادة من موقع Anabin.',                                                                                          tag:'r' },
+  { id:15, text:'شهادة الجامعة مختومة، موثقة من الخارجية، ومصدقة من السفارة — أصل وصورة.',                                                      tag:'r' },
+  { id:16, text:'شهادة الدرجات مختومة، موثقة من الخارجية، ومصدقة من السفارة.',                                                                   tag:'r' },
+  { id:17, text:'إثبات معرفة باللغة الألمانية أو الإنجليزية (إن توفر).',                                                                         tag:'p' },
+];
+
+const TAG_LABELS = { r:'مطلوب', o:'بديل', p:'+نقاط' };
+const STORAGE_KEY = 'chancenkarte_mobile_v2';
+const CIRC_FULL  = 2 * Math.PI * 18;
+const CIRC_MINI  = 2 * Math.PI * 15;
+
+let state = {};
+let currentTab = 'all';
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) { return {}; }
+}
+state = loadState();
+
+const scrollArea  = document.getElementById('scrollArea');
+const headerFull  = document.getElementById('headerFull');
+const headerMini  = document.getElementById('headerMini');
+const COLLAPSE_AT = 40;
+
+scrollArea.addEventListener('scroll', () => {
+  const scrolled = scrollArea.scrollTop > COLLAPSE_AT;
+  headerFull.classList.toggle('collapsed', scrolled);
+  headerMini.classList.toggle('visible',   scrolled);
+}, { passive: true });
+
+function renderList() {
+  const container = document.getElementById('listContainer');
+  container.innerHTML = '';
+
+  const filtered = ITEMS.filter(item => {
+    const done = !!state['cb_' + item.id];
+    if (currentTab === 'done')    return done;
+    if (currentTab === 'pending') return !done;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:40px 16px;color:var(--text-muted);font-size:15px;font-weight:600;">
+      ${currentTab === 'done' ? '🔲 لم تُكمل أي مستند بعد' : '✅ أكملت جميع المستندات!'}
+    </div>`;
+    return;
+  }
+
+  filtered.forEach(item => {
+    const done     = !!state['cb_'   + item.id];
+    const noteVal  = state['note_'  + item.id] || '';
+    const expanded = !!state['exp_' + item.id];
+
+    const card = document.createElement('div');
+    card.className = 'item-card' +
+      (item.highlight ? ' highlight' : '') +
+      (done           ? ' done'      : '') +
+      (expanded       ? ' expanded'  : '');
+    card.id = 'card_' + item.id;
+
+    card.innerHTML = `
+      <div class="item-main" onclick="toggleCheck(${item.id})">
+        <div class="item-check">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2.5 7L5.5 10L11.5 4" stroke="white" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="item-body">
+          <div class="item-num">${item.id} · ${TAG_LABELS[item.tag]}</div>
+          <div class="item-text">${item.text}</div>
+        </div>
+        <div class="item-tag tag-${item.tag}">${TAG_LABELS[item.tag]}</div>
+      </div>
+      <div class="item-notes${expanded ? ' open' : ''}" id="notes_${item.id}">
+        <div class="notes-inner">
+          <div class="notes-label">📝 ملاحظة خاصة</div>
+          <textarea
+            placeholder="أضف ملاحظتك هنا..."
+            onblur="saveNote(${item.id}, this.value)"
+            onclick="event.stopPropagation()"
+          >${noteVal}</textarea>
+        </div>
+      </div>
+      <div class="item-expand" onclick="toggleExpand(${item.id})">
+        <span>📝 ملاحظة</span>
+        <span class="expand-icon">▾</span>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function toggleCheck(id) {
+  state['cb_' + id] = !state['cb_' + id];
+  updateProgress();
+  renderList();
+  autoSave();
+}
+
+function toggleExpand(id) {
+  state['exp_' + id] = !state['exp_' + id];
+  const notes = document.getElementById('notes_' + id);
+  const card  = document.getElementById('card_'  + id);
+  if (notes) notes.classList.toggle('open',     !!state['exp_' + id]);
+  if (card)  card.classList.toggle('expanded',  !!state['exp_' + id]);
+}
+
+function saveNote(id, val) {
+  state['note_' + id] = val;
+  autoSave();
+}
+
+function autoSave() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function saveAll() {
+  document.querySelectorAll('.notes-inner textarea').forEach(ta => {
+    const id = ta.closest('.item-notes').id.replace('notes_', '');
+    state['note_' + id] = ta.value;
+  });
+  autoSave();
+  showToast('✓ يلا اللي بعده مفيش وقت');
+}
+
+function confirmReset() {
+  if (confirm('هل أنت متأكد؟ سيتم حذف كل التقدم والملاحظات.')) {
+    state = {};
+    autoSave();
+    updateProgress();
+    renderList();
+    showToast('تم إعادة الضبط');
+  }
+}
+
+function switchTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderList();
+}
+
+function updateProgress() {
+  const total   = ITEMS.length;
+  const checked = ITEMS.filter(i => !!state['cb_' + i.id]).length;
+  const pct     = Math.round((checked / total) * 100);
+  const pending = total - checked;
+
+  document.getElementById('checkedCount').textContent  = checked;
+  document.getElementById('cnt-all').textContent       = total;
+  document.getElementById('cnt-pending').textContent   = pending;
+  document.getElementById('cnt-done').textContent      = checked;
+
+  const pctTxt = pct + '%';
+  document.getElementById('ringPct').textContent = pctTxt;
+  document.getElementById('ringFill').style.strokeDashoffset =
+    CIRC_FULL - (pct / 100) * CIRC_FULL;
+
+  document.getElementById('miniRingPct').textContent = pctTxt;
+  document.getElementById('miniRingFill').style.strokeDashoffset =
+    CIRC_MINI - (pct / 100) * CIRC_MINI;
+
+  document.getElementById('completeBanner').classList.toggle('show', checked === total);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// Register service worker for offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+updateProgress();
+renderList();
+</script>
+</body>
+</html>
